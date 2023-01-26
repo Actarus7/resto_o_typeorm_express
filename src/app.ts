@@ -1,10 +1,9 @@
 import * as express from "express"
-import { Request, Response } from "express"
-import { Users } from "./entity/User"
 import { myDataSource } from "./app-data-source"
 import { usersRouter } from "./routes/usersRouter"
 import { commandesRouter } from "./routes/commandesRouter"
 import { menusRouter } from "./routes/menusRouter"
+import { restaurantsRouter } from "./routes/restaurantsRouter"
 
 // establish database connection
 myDataSource
@@ -39,7 +38,7 @@ app.use((req, res, next) => {
 app.use('/api/users', usersRouter);
 app.use('/api/commandes', commandesRouter);
 app.use('/api/menus', menusRouter);
-// app.use('/api/restaurants', restaurantsRouter);
+app.use('/api/restaurants', restaurantsRouter);
 
 app.use('/*', (req, res) => {
     res.status(404).json({
@@ -48,40 +47,6 @@ app.use('/*', (req, res) => {
         data: null
     })
 });
-
-
-
-/* app.get("/users", async function (req: Request, res: Response) {
-    const users = await myDataSource.getRepository(Users).find()
-    res.json(users)
-})
-
-app.get("/users/:id", async function (req: Request, res: Response) {
-    const results = await myDataSource.getRepository(Users).findOneBy({
-        id: parseInt(req.params.id),
-    })
-    return res.send(results)
-})
-
-app.post("/users", async function (req: Request, res: Response) {
-    const user = await myDataSource.getRepository(Users).create(req.body)
-    const results = await myDataSource.getRepository(Users).save(user)
-    return res.send(results)
-})
-
-app.put("/users/:id", async function (req: Request, res: Response) {
-    const user = await myDataSource.getRepository(Users).findOneBy({
-        id: parseInt(req.params.id),
-    })
-    myDataSource.getRepository(Users).merge(user, req.body)
-    const results = await myDataSource.getRepository(Users).save(user)
-    return res.send(results)
-})
-
-app.delete("/users/:id", async function (req: Request, res: Response) {
-    const results = await myDataSource.getRepository(Users).delete(req.params.id)
-    return res.send(results)
-}) */
 
 // start express server
 app.listen(3000)

@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
-import { Menus } from "../entity/Menus";
+import { Restaurants } from "../entity/Restaurants";
 import { Users } from "../entity/User";
-import { MenusService } from "../services/menusService";
+import { RestaurantsService } from "../services/restaurantsService";
+
+const restaurantsService = new RestaurantsService();
 
 
-const menusService = new MenusService();
+export class RestaurantsController {
 
+    async getAllRestaurants(req: Request, res: Response) {
 
-export class MenusController {
-
-    async getAllMenus(req: Request, res: Response) {
         try {
-            const menus = await menusService.selectAllMenus();
+            const restaurants = await restaurantsService.selectAllRestaurants();
 
-            if (!menus) {
+            if (!restaurants) {
                 res.status(400).json({
                     status: "FAIL",
-                    message: "Aucune menu disponible",
+                    message: "Aucun restaurant disponible",
                     data: null
                 });
             }
@@ -24,8 +24,8 @@ export class MenusController {
             else {
                 res.status(200).json({
                     status: "OK",
-                    message: "menus disponibles",
-                    data: menus
+                    message: "Restaurants disponibles",
+                    data: restaurants
                 });
             };
         }
@@ -41,16 +41,16 @@ export class MenusController {
         };
     };
 
-    async getMenuById(req: Request, res: Response) {
-        const menu_id = parseInt(req.params.id);
+    async getRestaurantById(req: Request, res: Response) {
+        const restaurant_id = parseInt(req.params.id);
 
         try {
-            const menu = await menusService.selectMenuById(menu_id);
+            const restaurant = await restaurantsService.selectRestaurantById(restaurant_id);
 
-            if (!menu) {
+            if (!restaurant) {
                 res.status(400).json({
                     status: "FAIL",
-                    message: "Menu inconnu",
+                    message: "Restaurant inconnu",
                     data: null
                 });
             }
@@ -58,8 +58,8 @@ export class MenusController {
             else {
                 res.status(200).json({
                     status: "OK",
-                    message: "Menu récupéré",
-                    data: menu
+                    message: "Restaurant récupéré",
+                    data: restaurant
                 });
             };
         }
@@ -73,30 +73,17 @@ export class MenusController {
                 data: null
             });
         };
+
     };
 
-    async postMenu(req: Request, res: Response) {
-        const { name, price } = req.body;
+    async postRestaurant(req: Request, res: Response) {
+        const ville = req.body.ville;
+        const userId = Number(req.userId);
 
-        const error = {
-            statusCode: 400,
-            message: '',
-            status: 'FAIL',
-            data: null
-        };
-
-        if (!price || (typeof (price) != 'number')) {
-            error.message = "Prix manquant ou Type de donnée incorrect"
-        }
-
-        else if (!name || (typeof (name) != 'string')) {
-            error.message = "Name manquant ou Type de donnée incorrect"
-        }
-
-        if (error.message) {
-            res.status(error.statusCode).json({
+        if (!ville || (typeof (ville) != 'string')) {
+            res.status(400).json({
                 status: 'FAIL',
-                message: error.message,
+                message: "Ville manquant ou type de donnée incorrect",
                 data: null
             });
 
@@ -105,12 +92,25 @@ export class MenusController {
 
 
         try {
-            const newMenu = await menusService.addMenu(name, price);
+            const userLogged = await Users.findOneBy({ id: userId });
+
+            if (!userLogged.admin) {
+                res.status(401).json({
+                    status: 'FAIL',
+                    message: "Il faut être admin pour ajouter un nouveau restaurant",
+                    data: null
+                });
+
+                return;
+            };
+
+
+            const newRestaurant = await restaurantsService.addRestaurant(ville);
 
             res.status(200).json({
                 status: "OK",
-                message: "Menu crée",
-                data: newMenu
+                message: "Restaurant créé",
+                data: newRestaurant
             });
         }
         catch (error) {
@@ -124,73 +124,55 @@ export class MenusController {
         };
     };
 
-    async putMenu(req: Request, res: Response) {
-        const { name, price } = req.body;
-        const user_IdLogged = Number(req.userId);
-        const updateId = parseInt(req.params.id);
+    async putRestaurant(req: Request, res: Response) {
+        const updateId= parseInt(req.params.id);
+        const ville = req.body.ville;
+        const userId = Number(req.userId);
 
-        const error = {
-            statusCode: 400,
-            message: '',
-            status: 'FAIL',
-            data: null
-        };
-
-
-        if (!price || (typeof (price) != 'number')) {
-            error.message = "Prix manquant ou Type de donnée incorrect"
-        }
-
-        else if (!name || (typeof (name) != 'string')) {
-            error.message = "name manquant ou Type de donnée incorrect"
-        }
-
-        if (error.message) {
-            res.status(error.statusCode).json({
+        if (!ville || (typeof (ville) != 'string')) {
+            res.status(400).json({
                 status: 'FAIL',
-                message: error.message,
+                message: "Ville manquant ou type de donnée incorrect",
                 data: null
             });
 
             return;
         };
 
-
         try {
-            const checkMenu = await Menus.findOneBy({ id: updateId });
-            
-            if (!checkMenu) {
-                res.status(404).json({
+            const checkRestaurant = await Restaurants.findOneBy({id: updateId});
+
+            if (!checkRestaurant){
+                res.status(400).json({
                     status: 'FAIL',
-                    message: "Menu ID inconnu - Vérifier le numéro du menu",
+                    message: "Restaurant Id inconnu - Vérifiez l'Id du restaurant",
                     data: null
                 });
 
                 return;
             };
 
-            const admin_user_id_logged = await Users.findUserById(user_IdLogged);
+            const userLogged = await Users.findOneBy({ id: userId });
 
-            if (!admin_user_id_logged?.admin) {
-                res.status(403).json({
+            if (!userLogged?.admin) {
+                res.status(401).json({
                     status: 'FAIL',
-                    message: "Modification non autorisée - Vous n'êtes pas admin",
+                    message: "Il faut être admin pour modifier un restaurant",
                     data: null
                 });
 
                 return;
             };
 
-
-            const updatedMenu = await menusService.updateMenu(updateId, name, price);
+            const updatedRestaurant = await restaurantsService.updateRestaurant(updateId, ville);
 
             res.status(200).json({
                 status: "OK",
-                message: "Menu modifié",
-                data: updatedMenu
+                message: "Restaurant modifié",
+                data: updatedRestaurant
             });
-        }
 
+        }
         catch (error) {
             console.log((error.stack));
 
@@ -200,9 +182,10 @@ export class MenusController {
                 data: null
             });
         };
+
     };
 
-    async deleteMenu(req: Request, res: Response) {
+    async deleteRestaurant(req: Request, res: Response){
         const deleteId = parseInt(req.params.id);
         const user_IdLogged = req.userId;
 
@@ -219,12 +202,12 @@ export class MenusController {
 
         try {
 
-            const checkMenu = await Menus.findOneBy({ id: deleteId });
+            const checkRestaurant = await Restaurants.findOneBy({ id: deleteId });
             
-            if (!checkMenu) {
+            if (!checkRestaurant) {
                 res.status(404).json({
                     status: 'FAIL',
-                    message: "Menu ID inconnu - Vérifier le numéro du menu",
+                    message: "Restaurant ID inconnu - Vérifier le numéro du restaurant",
                     data: null
                 });
                 
@@ -237,7 +220,7 @@ export class MenusController {
             if (!userLogged?.admin) {
                 res.status(403).json({
                     status: 'FAIL',
-                    message: "Delete non autorisé - Vous n'êtes pas admin",
+                    message: "Il faut être admin pour delete un restaurant",
                     data: null
                 });
 
@@ -245,12 +228,12 @@ export class MenusController {
             };
 
 
-            const deletedMenu = await menusService.deleteMenu(deleteId);
+            const deleteRestaurant = await restaurantsService.deleteRestaurant(deleteId);
 
             res.status(200).json({
                 status: "OK",
-                message: "Menu supprimé",
-                data: deletedMenu
+                message: "Restaurant supprimé",
+                data: deleteRestaurant
             });
         }
         catch (error) {
@@ -263,5 +246,5 @@ export class MenusController {
             });
         };
     };
-    
+
 };

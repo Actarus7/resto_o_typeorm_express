@@ -10,8 +10,8 @@ const menusController = new MenusController();
 
 
 // Routes
-menusRouter.get('/:id', menusController.getOneMenu);
 menusRouter.get('/', menusController.getAllMenus);
+menusRouter.get('/:id', menusController.getMenuById);
 menusRouter.post('/', authenticateJWT, menusController.postMenu);
 menusRouter.put('/:id', authenticateJWT, menusController.putMenu);
 menusRouter.delete('/:id', authenticateJWT, menusController.deleteMenu);

@@ -23,10 +23,10 @@ export class UsersController {
         }
         catch (error) {
             console.log((error.stack));
-
+            
             res.status(500).json({
                 status: "FAIL",
-                message: "Erreur serveur",
+                message: "Erreur serveur ou inconnue",
                 data: null
             });
         };
@@ -87,12 +87,12 @@ export class UsersController {
 
         bcrypt.hash(password, 10, async (err, password) => {
             try {
-                const data = await usersService.addUser(username, password, e_mail, admin);
+                const user = await usersService.addUser(username, password, e_mail, admin);
 
                 res.status(200).json({
                     status: 'OK',
                     message: 'User créé !',
-                    data: data
+                    data: user
                 });
             }
 
@@ -185,6 +185,6 @@ export class UsersController {
         };
     };
 
-}
+};
 
 

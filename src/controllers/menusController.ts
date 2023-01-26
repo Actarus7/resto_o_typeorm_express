@@ -9,7 +9,9 @@ const menusService = new MenusService();
 
 export class MenusController {
 
+    // RECUPERE TOUS LES MENUS
     async getAllMenus(req: Request, res: Response) {
+
         try {
             const menus = await menusService.selectAllMenus();
 
@@ -41,9 +43,22 @@ export class MenusController {
         };
     };
 
+    // RECUPERE UN MENU (par son Id)
     async getMenuById(req: Request, res: Response) {
         const menu_id = parseInt(req.params.id);
 
+        // VERIFIE LA DONNEE COTE UTILISATEUR
+        if (!menu_id || (typeof (menu_id) === 'number')) {
+            res.status(400).json({
+                status: 'FAIL',
+                message: "Id manquant ou Type de donnée incorrect (attendu 'Number')",
+                data: null
+            });
+
+            return;
+        };
+
+        // RECUPERATION DU MENU
         try {
             const menu = await menusService.selectMenuById(menu_id);
 
@@ -75,8 +90,10 @@ export class MenusController {
         };
     };
 
+    // CREATION D'UN NOUVEAU MENU
     async postMenu(req: Request, res: Response) {
         const { name, price } = req.body;
+        const user_IdLogged = req.userId;
 
         const error = {
             statusCode: 400,
@@ -85,6 +102,7 @@ export class MenusController {
             data: null
         };
 
+        // VERIFIE LES DONNEES COTE UTILSATEUR
         if (!price || (typeof (price) != 'number')) {
             error.message = "Prix manquant ou Type de donnée incorrect"
         }
@@ -105,11 +123,25 @@ export class MenusController {
 
 
         try {
+            // VERIFIE SI LE USER CONNECTE EST UN ADMIN
+            const userLogged = await Users.findUserById(user_IdLogged);
+
+            if (!userLogged?.admin) {
+                res.status(403).json({
+                    status: 'FAIL',
+                    message: "Delete non autorisé - Vous n'êtes pas admin",
+                    data: null
+                });
+
+                return;
+            };
+
+            //  CREATION DU MENU
             const newMenu = await menusService.addMenu(name, price);
 
             res.status(200).json({
                 status: "OK",
-                message: "Menu crée",
+                message: "Menu créé",
                 data: newMenu
             });
         }
@@ -124,6 +156,7 @@ export class MenusController {
         };
     };
 
+    // MODIFICATION D'UN MENU
     async putMenu(req: Request, res: Response) {
         const { name, price } = req.body;
         const user_IdLogged = Number(req.userId);
@@ -136,7 +169,7 @@ export class MenusController {
             data: null
         };
 
-
+        // VERIFICATION DES DONNEES COTE UTILISATEUR
         if (!price || (typeof (price) != 'number')) {
             error.message = "Prix manquant ou Type de donnée incorrect"
         }
@@ -157,6 +190,7 @@ export class MenusController {
 
 
         try {
+            // VERIFIE SI LE MENU A MODIFIER EXISTE
             const checkMenu = await Menus.findOneBy({ id: updateId });
             
             if (!checkMenu) {
@@ -169,6 +203,7 @@ export class MenusController {
                 return;
             };
 
+            // VERIFIE SI LE USER CONNECTE EST UN ADMIN
             const admin_user_id_logged = await Users.findUserById(user_IdLogged);
 
             if (!admin_user_id_logged?.admin) {
@@ -182,6 +217,7 @@ export class MenusController {
             };
 
 
+            // MODIFICATION DU MENU
             const updatedMenu = await menusService.updateMenu(updateId, name, price);
 
             res.status(200).json({
@@ -202,10 +238,12 @@ export class MenusController {
         };
     };
 
+    // SUPPRESSION D'UN MENU
     async deleteMenu(req: Request, res: Response) {
         const deleteId = parseInt(req.params.id);
         const user_IdLogged = req.userId;
 
+        // VERIFICATION DES DONNEES COTE UTILISATEUR
         if (!deleteId || (typeof (deleteId) !== 'number')) {
             res.status(400).json({
                 status: 'FAIL',
@@ -218,7 +256,7 @@ export class MenusController {
 
 
         try {
-
+            // VERIFIE SI LE MENU A MODIFIER EXISTE
             const checkMenu = await Menus.findOneBy({ id: deleteId });
             
             if (!checkMenu) {
@@ -231,7 +269,7 @@ export class MenusController {
                 return;
             };
             
-
+            // VERIFIE SI LE USER CONNECTE EST UN ADMIN
             const userLogged = await Users.findUserById(user_IdLogged);
 
             if (!userLogged?.admin) {
@@ -244,7 +282,7 @@ export class MenusController {
                 return;
             };
 
-
+            // SUPPRESSION DU MENU
             const deletedMenu = await menusService.deleteMenu(deleteId);
 
             res.status(200).json({
@@ -263,5 +301,5 @@ export class MenusController {
             });
         };
     };
-    
+
 };

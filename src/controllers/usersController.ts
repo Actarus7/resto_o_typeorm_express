@@ -11,6 +11,7 @@ const accessTokenSecret = process.env.TOKEN_SECRET as string;
 
 export class UsersController {
 
+    // RECUPERATION DE TOUS LES USERS
     async getAllUsers(req: Request, res: Response) {
         try {
             const users = await usersService.selectAllUsers();
@@ -23,7 +24,7 @@ export class UsersController {
         }
         catch (error) {
             console.log((error.stack));
-            
+
             res.status(500).json({
                 status: "FAIL",
                 message: "Erreur serveur ou inconnue",
@@ -32,8 +33,9 @@ export class UsersController {
         };
     };
 
+    // CREATION D'UN NOUVEAU USER
     async register(req: Request, res: Response) {
-        const { username, password, e_mail, admin} = req.body;
+        const { username, password, e_mail, admin } = req.body;
 
         const error = {
             statusCode: 400,
@@ -42,6 +44,7 @@ export class UsersController {
             data: null
         };
 
+        // VERIFICATION DES DONNEES COTE UTILISATEUR
         if (!username && !(typeof (username) === 'string')) {
             error.message = "Username manquant ou Type de donnée incorrect (attendu 'String')";
         }
@@ -64,6 +67,7 @@ export class UsersController {
             return;
         };
 
+        // VERIFIE SI LE USERNAME ET L'EMAIL EXISTENT DEJA
         const isUsernameExists = await usersService.selectUserByUsername(username);
         const isEmailExists = await usersService.selectUserByEmail(e_mail);
 
@@ -85,6 +89,7 @@ export class UsersController {
             return;
         };
 
+        // HASHAGE DU MDP
         bcrypt.hash(password, 10, async (err, password) => {
             try {
                 const user = await usersService.addUser(username, password, e_mail, admin);
@@ -106,11 +111,9 @@ export class UsersController {
                 });
             };
         });
-
-
-
     };
 
+    // CONNEXION D'UN USER
     async login(req: Request, res: Response) {
         const { username, password } = req.body;
 
@@ -121,6 +124,7 @@ export class UsersController {
             data: null
         };
 
+        // VERIFICATION DES DONNEES COTE UTILISATEUR
         if (!username && !(typeof (username) === 'string')) {
             error.message = "Username manquant ou Type de donnée incorrect (attendu 'String')";
         }
@@ -140,6 +144,7 @@ export class UsersController {
         };
 
         try {
+            // VERIFIE SI LE USERNAME EXISTE
             const user = await usersService.selectUserByUsername(username);
 
             if (user === null) {
@@ -154,6 +159,7 @@ export class UsersController {
 
             const accessToken: string = jwt.sign({ userId: user.id }, accessTokenSecret);
 
+            // COMPARAISON DES MDP
             bcrypt.compare(password, user.password, async (err: any, result: boolean) => {
 
                 if (result == true) {

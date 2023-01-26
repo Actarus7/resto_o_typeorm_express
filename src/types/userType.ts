@@ -8,5 +8,4 @@ export interface IUser {
     password: string;
     e_mail: string;
     admin: boolean;
-    commandes_id: Commandes[];
 };

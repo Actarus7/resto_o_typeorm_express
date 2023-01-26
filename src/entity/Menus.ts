@@ -9,7 +9,7 @@ export class Menus extends BaseEntity {
     @Column({type: 'varchar'})
     name: string;
 
-    @Column({type: 'money'})
+    @Column({type: 'numeric'})
     price: number;
 
     @OneToMany(() => Commandes, commande => commande.menu_id)

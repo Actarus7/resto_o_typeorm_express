@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm"
+import { BaseEntity, DataSource } from "typeorm"
 import { Commandes } from "./entity/Commandes"
 import { Menus } from "./entity/Menus"
 import { Restaurants } from "./entity/Restaurants"
@@ -14,7 +14,7 @@ export const myDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
-    entities: [Users, Restaurants, Commandes, Menus],
+    entities: [Users, Restaurants, Commandes, Menus, BaseEntity],
     logging: false,
     synchronize: true,
 });

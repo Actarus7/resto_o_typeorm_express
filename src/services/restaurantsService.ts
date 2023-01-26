@@ -1,13 +1,14 @@
 // Imports
 import { BaseEntity } from "typeorm";
-import { Menus } from "../entity/Menus";
 import { Restaurants } from "../entity/Restaurants";
+import { IRestaurant } from "../types/restaurantType";
 
 
 // Exports - Déclarations
 export class RestaurantsService extends BaseEntity {
 
-    async selectAllRestaurants() {
+    // RECUPERE TOUS LES RESTAURANTS
+    async selectAllRestaurants(): Promise<IRestaurant []> {
         const restaurants = await Restaurants.find();
 
         if (restaurants) {
@@ -17,17 +18,30 @@ export class RestaurantsService extends BaseEntity {
         return undefined;
     };
 
-    async selectRestaurantById(id: number) {
-        const restaurants = await Restaurants.findOneBy({ id: id });
+    // RECUPERE UN RESTAURANT (par son Id)
+    async selectRestaurantById(id: number): Promise<IRestaurant> {
+        const restaurant = await Restaurants.findOneBy({ id: id });
 
-        if (restaurants) {
-            return restaurants;
+        if (restaurant) {
+            return restaurant;
         };
 
         return undefined;
     };
 
-    async addRestaurant(ville) {
+    //RECUPERE UN RESTAURANT (par son nom de ville)
+    async selectRestaurantByVille(ville: string): Promise<IRestaurant> {
+        const restaurant = await Restaurants.findOneBy({ ville: ville });
+
+        if (restaurant) {
+            return restaurant;
+        };
+
+        return undefined;
+    };
+
+    // CREATION D'UN NOUVEAU RESTAURANT
+    async addRestaurant(ville): Promise<IRestaurant> {
         const newRestaurant = new Restaurants();
         newRestaurant.ville = ville;
 
@@ -36,7 +50,8 @@ export class RestaurantsService extends BaseEntity {
         return newRestaurant;
     };
 
-    async updateRestaurant(updateId, ville ) {
+    // MODIFICATION D'UN RESTAURANT
+    async updateRestaurant(updateId, ville): Promise<IRestaurant> {
         const updateRestaurant = await Restaurants.update({ id: updateId }, { ville: ville });
         if (updateRestaurant) {
             return await Restaurants.findOneBy({ id: updateId });
@@ -45,8 +60,9 @@ export class RestaurantsService extends BaseEntity {
         return undefined;
     };
 
-    async deleteRestaurant(deleteId: number) {
-        const deleteRestaurant = await Restaurants.findOneBy({id: deleteId});
+    // SUPPRESSION D'UN RESTAURANT
+    async deleteRestaurant(deleteId: number): Promise<IRestaurant> {
+        const deleteRestaurant = await Restaurants.findOneBy({ id: deleteId });
         await deleteRestaurant.remove();
 
         if (deleteRestaurant) {

@@ -1,10 +1,13 @@
 // Imports
 import { Menus } from "../entity/Menus";
+import { IMenu } from "../types/menuType";
 
 
 // Exports - Déclarations
 export class MenusService {
-    async selectAllMenus() {
+
+    // RECUPERE TOUS LES MENUS
+    async selectAllMenus(): Promise<IMenu[]> {
         const menus = await Menus.find({
             /* relations: {
                 menu_id: true,
@@ -20,7 +23,8 @@ export class MenusService {
         return undefined;
     };
 
-    async selectMenuById(id: number) {
+    // RECUPERE UN MENU (par son Id)
+    async selectMenuById(id: number): Promise<IMenu> {
         const menu = await Menus.findOneBy({ id: id });
 
         if (menu) {
@@ -30,7 +34,8 @@ export class MenusService {
         return undefined;
     };
 
-    async addMenu(name, price) {
+    // CREATION D'UN NOUVEAU MENU
+    async addMenu(name, price): Promise<IMenu> {
         const newMenu = new Menus();
         newMenu.name = name;
         newMenu.price = price;
@@ -40,8 +45,9 @@ export class MenusService {
         return newMenu;
     };
 
-    async updateMenu(updateId, name, price, ) {
-        const updateCommande = await Menus.update({ id: updateId }, { name : name, price: price });
+    // MODIFICATION D'UN MENU
+    async updateMenu(updateId, name, price,): Promise<IMenu> {
+        const updateCommande = await Menus.update({ id: updateId }, { name: name, price: price });
         if (updateCommande) {
             return await Menus.findOneBy({ id: updateId });
         };
@@ -49,8 +55,9 @@ export class MenusService {
         return undefined;
     };
 
-    async deleteMenu(deleteId: number) {
-        const deleteMenu = await Menus.findOneBy({id: deleteId});
+    // SUPPRESSION D'UN MENU
+    async deleteMenu(deleteId: number): Promise<IMenu> {
+        const deleteMenu = await Menus.findOneBy({ id: deleteId });
         await deleteMenu.remove();
 
         if (deleteMenu) {

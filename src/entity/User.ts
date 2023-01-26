@@ -11,7 +11,7 @@ export class Users extends BaseEntity {
     @Column({type: 'varchar'})
     username: string;
 
-    @Column({type: 'varchar'})
+    @Column({type: 'varchar'/* , select: false */})
     password: string;
 
     @Column({type: "varchar"})

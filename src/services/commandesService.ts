@@ -1,22 +1,14 @@
 // Imports
 import { Commandes } from "../entity/Commandes";
+import { ICommande } from "../types/commandeType";
 
 
 // Exports - Déclarations
 export class CommandesService {
 
-    // METHODE MASTER QUERYBUILDER
-    /* async selectAllCommandes() {
-        const commandes = await Commandes.findAllCommandes();
-
-        if (commandes) {
-            return commandes;
-        };
-
-        return undefined;
-    }; */
-    // METHODE "SIMPLE"
-    async selectAllCommandes() {
+    // RECUPERE TOUTES LES COMMANDES
+    // Méthode Autre
+    async selectAllCommandes(): Promise<ICommande[]> {
         const commandes = await Commandes.find({
             relations: {
                 menu_id: true,
@@ -31,8 +23,30 @@ export class CommandesService {
 
         return undefined;
     };
+    // Méthode QueryBuilder
+    /* async selectAllCommandes() {
+        const commandes = await Commandes.findAllCommandes();
 
-    // METHODE MASTER QUERYBUILDER
+        if (commandes) {
+            return commandes;
+        };
+
+        return undefined;
+    }; */
+
+
+    // RECUPERE UNE COMMANDE (par son Id)
+    // Méthode Autre
+    async selectCommandeById(id: number): Promise<ICommande> {
+        const commande = await Commandes.findOneBy({ id: id });
+
+        if (commande) {
+            return commande;
+        };
+
+        return undefined;
+    };
+    // Méthode QueryBuilder
     /* async selectCommandeById(id: number) {
         const commande = await Commandes.findCommandeById(id);
 
@@ -42,26 +56,11 @@ export class CommandesService {
 
         return undefined;
     }; */
-    // METHODE "SIMPLE"
-    async selectCommandeById(id: number) {
-        const commande = await Commandes.findOneBy({ id: id });
 
-        if (commande) {
-            return commande;
-        };
 
-        return undefined;
-    };
-
-    // METHODE MASTER QUERYBUILDER
-    /* async addCommande(price: number, menu_id: number, user_id: number, restaurant_id: number) {
-        const newCommande = await Commandes.createCommande(price, menu_id, user_id, restaurant_id);
-
-        return newCommande.raw;
-
-    }; */
-    // METHODE "SIMPLE"
-    async addCommande(price, menu_id, user_id, restaurant_id) {
+    // CREATION D'UNE NOUVELLE COMMANDE
+    // Méthode Autre
+    async addCommande(price, menu_id, user_id, restaurant_id): Promise<ICommande> {
         const newCommande = new Commandes()
         newCommande.price = price;
         newCommande.menu_id = menu_id;
@@ -74,15 +73,18 @@ export class CommandesService {
 
 
     };
+    // Méthode QueryBuilder
+    /* async addCommande(price: number, menu_id: number, user_id: number, restaurant_id: number) {
+        const newCommande = await Commandes.createCommande(price, menu_id, user_id, restaurant_id);
 
-    // METHODE MASTER QUERYBUILDER
-    /* async updateCommande(updateId: number, price: number, menu_id: number, user_id: number, restaurant_id: number) {
-        const updatedCommande = await Commandes.updateCommande(updateId, price, menu_id, user_id, restaurant_id);
+        return newCommande.raw;
 
-        return updatedCommande.raw;
     }; */
-    // METHODE "SIMPLE"
-    async updateCommande(updateId, price, menu_id, user_id, restaurant_id) {
+
+
+    // MODIFICATION D'UNE COMMANDE
+    // Méthode Autre
+    async updateCommande(updateId, price, menu_id, user_id, restaurant_id): Promise<ICommande> {
         const updateCommande = await Commandes.update({ id: updateId }, { price: price, menu_id: menu_id, user_id: user_id, restaurant_id: restaurant_id });
         if (updateCommande) {
             return await Commandes.findOneBy({ id: updateId });
@@ -90,16 +92,18 @@ export class CommandesService {
 
         return undefined;
     };
+    // Méthode QueryBuilder
+    /* async updateCommande(updateId: number, price: number, menu_id: number, user_id: number, restaurant_id: number) {
+        const updatedCommande = await Commandes.updateCommande(updateId, price, menu_id, user_id, restaurant_id);
 
-    // METHODE MASTER QUERYBUILDER
-    /* async deleteCommande(deleteId: number) {
-        const deletedCommande = await Commandes.deleteCommande(deleteId);
-
-        return deletedCommande.raw;
+        return updatedCommande.raw;
     }; */
-    // METHODE "SIMPLE"
-    async deleteCommande(deleteId: number) {
-        const deleteCommande = await Commandes.findOneBy({id: deleteId});
+
+
+    // DELETE D'UNE COMMANDE
+    // Méthode Autre
+    async deleteCommande(deleteId: number): Promise<ICommande> {
+        const deleteCommande = await Commandes.findOneBy({ id: deleteId });
         await deleteCommande.remove();
 
         if (deleteCommande) {
@@ -107,5 +111,11 @@ export class CommandesService {
         };
         return undefined;
     };
-};
+    // Méthode QueryBuilder
+    /* async deleteCommande(deleteId: number) {
+        const deletedCommande = await Commandes.deleteCommande(deleteId);
 
+        return deletedCommande.raw;
+    }; */
+
+};

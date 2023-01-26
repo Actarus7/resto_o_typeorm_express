@@ -11,7 +11,7 @@ export class Commandes extends BaseEntity {
     @Column({ type: 'timestamp with time zone', default: () => "CURRENT_TIMESTAMP" })
     date: Date;
 
-    @Column({ type: 'money' })
+    @Column({ type: 'numeric' })
     price: number;
 
     @ManyToOne(() => Users, (user) => user.commandes_id)

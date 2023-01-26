@@ -1,0 +1,45 @@
+-- Table USERS
+id: (postgres: "serial") (VSC: "number")
+username: (postgres: "varchar") (VSC: "string")
+password: (postgres: "varchar") (VSC: "string")
+admin: (postgres: "boolean") (VSC: "boolean")
+(penser aux relations OneToMany/ManyToOne etc)
+
+
+
+
+-- Tables RESTAURANTS
+id: (postgres: "serial") (VSC: "number")
+ville: (postgres: "varchar") (VSC: "string")
+(penser aux relations OneToMany/ManyToOne etc)
+
+
+
+
+-- Tables MENUS
+id: (postgres: "serial") (VSC: "number")
+nom: (postgres: "varchar") (VSC: "string")
+prix: (postgres: "money") (VSC: "number")
+(penser aux relations OneToMany/ManyToOne etc)
+
+
+
+
+
+-- Tables COMMANDES
+id: (postgres: "serial") (VSC: "number")
+date: (postgres: "timestamp with time zone") (VSC: "Date")
+statut: string
+prix: (postgres: "money") (VSC: "number")
+
+(penser aux relations OneToMany/ManyToOne etc)
+userId: int
+list_menus: Menus[] 
+
+
+
+
+-- Tables STATUS COMMANDES
+id: (postgres: "serial") (VSC: "number")
+intitule: (postgres: "varchar") (VSC: "string")
+(penser aux relations OneToMany/ManyToOne etc)

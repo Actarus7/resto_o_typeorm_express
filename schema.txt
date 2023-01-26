@@ -1,0 +1,12 @@
+1. Template Typeorm - OK
+2. Créer les tables USERS/RESTAURANTS/MENUS/COMMANDE OK
+3. Créer toutes les requêtes 
+3. Créer des users/restaurants/menus/commandes pour pouvoir faire des tests 
+4. Contrôle des données entrantes CONTROLLERS
+5. 
+6. Authentification
+7. Documentation de l'API
+
+
+BONUS
+Ajout rôles client/admin
